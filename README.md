@@ -1,185 +1,80 @@
-# 🚀 Java Template
+# Revolut "Build it" interview prep
 
-[![Java Version](https://img.shields.io/badge/Java-25_LTS-orange.svg)](https://adoptium.net/temurin/releases/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Gradle](https://img.shields.io/badge/Gradle-Kotlin_DSL-02303A.svg)](https://docs.gradle.org/current/userguide/kotlin_dsl.html)
-[![mise](https://img.shields.io/badge/mise-managed-blue.svg)](https://mise.jdx.dev)
-[![lefthook](https://img.shields.io/badge/lefthook-enabled-green.svg)](https://github.com/evilmartians/lefthook)
-[![Spotless](https://img.shields.io/badge/Spotless-enabled-brightgreen.svg)](https://github.com/diffplug/spotless)
-[![Error Prone](https://img.shields.io/badge/Error_Prone-enabled-brightgreen.svg)](https://errorprone.info/)
-[![act](https://img.shields.io/badge/act-CI_simulation-blueviolet.svg)](https://github.com/nektos/act)
+A ready-to-type Java 25 project for a live-coding session, plus the reference material behind it.
+Two things it gives you: a build that will not get in your way at minute two, and three worked
+katas covering the exact ground the role advertises — concurrency, correctness under contention, and
+money that never goes missing.
 
-This is a modern GitHub template repository for Java projects. Use this template to create a new Java application with a
-standardized structure, automated tooling, and best practices built-in.
+## Right now, before anything else
 
-## ✨ Features
-
-- ☕ **Modern Java**: Java 25 LTS via a Gradle toolchain, so local builds and CI compile against the exact same JDK.
-- 🐘 **Gradle with the Kotlin DSL**: Type-safe build scripts, a committed wrapper, and all dependency versions declared
-  once in a [version catalog](gradle/libs.versions.toml).
-- 🐛 **Bug Detection at Compile Time**: **Error Prone** plus **NullAway** turn whole classes of runtime failures —
-  including `NullPointerException` — into compile errors.
-- 🎨 **Zero-Debate Formatting**: **Spotless** with `palantir-java-format` formats Java, Gradle, and misc files.
-- 🧪 **Tests and Coverage**: **JUnit 5** with **AssertJ** assertions, and **JaCoCo** enforcing a coverage floor as part
-  of `check`.
-- 🔧 **Modern Tooling**: Pre-configured with **mise** for tool and task management, **Lefthook** for Git hooks,
-  **Cocogitto** for Conventional Commits, and **act** for local CI simulation.
-- 📦 **Single-File Distribution**: A shaded, runnable `bin/app.jar` built by the **Shadow** plugin.
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- [mise](https://mise.jdx.dev) - A multi-language version manager and task runner.
-- [Java](https://adoptium.net/) - JDK 25 (managed by mise).
-- [act](https://github.com/nektos/act) - Run your GitHub Actions locally.
-
-### Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/tabmadi/java-template.git
-   cd java-template
-   ```
-
-2. **Setup environment**:
-   ```bash
-   # Install all required tools using mise
-   mise install
-
-   # Set up the project (download dependencies and install git hooks)
-   mise run setup
-   ```
-
-## 🏃‍♂️ Usage
-
-Instructions on how to run the project.
-
-```bash
-# Run the application directly (development)
-mise run run
-
-# Build and run the production jar
-mise run build
-java -jar bin/app.jar
+```sh
+mise run setup    # installs the toolchain and git hooks, warms the dependency cache
+mise run test     # should be green in a few seconds
 ```
 
-## 🛠️ Development
+Do this the day before the interview as well as an hour before it.
 
-### Available Scripts
+## During the interview
 
-| Script            | Description                                     |
-|-------------------|-------------------------------------------------|
-| `mise run setup`  | Set up the project dependencies                 |
-| `mise run clean`  | Clean build artifacts                           |
-| `mise run format` | Format the code (Spotless)                      |
-| `mise run lint`   | Run Spotless checks and compile with Error Prone |
-| `mise run test`   | Run tests and verify coverage                   |
-| `mise run check`  | Format, lint, and test                          |
-| `mise run build`  | Build the shaded jar into `bin/app.jar`         |
-| `mise run run`    | Run the application                             |
-| `mise run start`  | Build, then run the jar                         |
-| `mise run act`    | Simulate CI locally with act                    |
+Write in `src/main/java/io/github/tabmadi/interview/` — it is empty on purpose. Its test counterpart
+`StarterTest` is a template to type over: nested classes per stage, `@DisplayName`s that state
+behaviours, and a working concurrency test.
 
-### 🧹 Code Quality
-
-Formatting is handled by **Spotless**, and correctness by **Error Prone** + **NullAway**, which run as part of every
-compilation. Warnings are errors (`-Xlint:all -Werror`), so the build fails on anything the compiler flags.
-
-```bash
-# Check formatting and compile with all static analysis enabled
-mise run lint
-
-# Auto-format the code
-mise run format
+```sh
+mise run tdd      # continuous test loop -- leave it running in a split pane
 ```
 
-### 🧪 Tests
+Read [docs/PLAYBOOK.md](docs/PLAYBOOK.md) first. It is the minute-by-minute: what to ask in the first
+five minutes, how to stage the build, and what to have ready for the discussion afterwards.
 
-Tests use **JUnit 5** with **AssertJ** assertions. **JaCoCo** enforces a line coverage floor of 80% (excluding the
-entry point); the HTML report lands in `build/reports/jacoco/test/html/index.html`.
+## What is here
 
-```bash
-mise run test
-```
+### Katas — read these, do not copy them
 
-### 🪝 Git Hooks & Conventional Commits
+Reference implementations of the three problems this interview keeps circling. Each is small,
+heavily commented with the *reasoning* rather than the mechanics, and covered by tests that fail if
+the concurrency is wrong.
 
-This project uses **Lefthook** for Git hooks and follows **Conventional Commits**.
+| Kata | The thing it teaches |
+| --- | --- |
+| [`katas/ledger`](src/main/java/io/github/tabmadi/katas/ledger) | Double-entry accounts, atomic transfers, deadlock-free two-key locking, idempotency keys, an audit trail. The canonical staged exercise. |
+| [`katas/ratelimiter`](src/main/java/io/github/tabmadi/katas/ratelimiter) | A lock-free token bucket: CAS over immutable state, lazy refill without drift, no background threads. |
+| [`katas/ttlcache`](src/main/java/io/github/tabmadi/katas/ttlcache) | TTL expiry and single-flight loading — how a cache avoids turning one miss into a thousand queries. |
 
-- **Pre-commit**: Formats code and runs the linters.
-- **Commit-msg**: Validates commit message format.
-- **Pre-push**: Final Conventional Commits check on the whole branch.
+Shared building block: [`concurrent/KeyedLocks`](src/main/java/io/github/tabmadi/concurrent/KeyedLocks.java)
+— one lock per key, with ordered acquisition for the two-key case.
 
-#### Conventional Commits Example:
+Test harness: [`support/Concurrently`](src/test/java/io/github/tabmadi/support/Concurrently.java) —
+parks every worker on one latch and releases them together, so the contended window is real. A
+concurrency test without this usually proves nothing.
 
-```bash
-# ✅ Valid commit messages
-git commit -m "feat: add user authentication"
-git commit -m "fix: resolve memory leak"
-```
+### Notes
 
-## 📁 Project Structure
+| Document | Use it for |
+| --- | --- |
+| [PLAYBOOK.md](docs/PLAYBOOK.md) | How to spend the hour: clarifying questions, staging, closing |
+| [CONCURRENCY.md](docs/CONCURRENCY.md) | JMM, choosing a mechanism, virtual threads, testing races |
+| [POSTGRES.md](docs/POSTGRES.md) | MVCC, isolation, locking, `SKIP LOCKED`, indexes, reading a plan |
+| [SYSTEM_DESIGN.md](docs/SYSTEM_DESIGN.md) | DDD, idempotency, outbox, sagas, scaling the kata to 80M users |
+| [GO_TO_JAVA.md](docs/GO_TO_JAVA.md) | The translation table, and what to say about the switch |
+| [SNIPPETS.md](docs/SNIPPETS.md) | Shapes you should not be re-deriving live |
 
-```
-.
-├── src/
-│   ├── main/
-│   │   ├── java/           # Application code
-│   │   └── resources/      # application.conf, logback.xml
-│   └── test/java/          # Tests
-├── gradle/
-│   ├── libs.versions.toml  # Dependency version catalog
-│   └── wrapper/            # Gradle wrapper
-├── scripts/                # Helper scripts
-├── bin/                    # Built jar (created by build)
-├── .github/                # GitHub Actions and act configuration
-├── build.gradle.kts        # Build configuration
-├── mise.toml               # Mise configuration
-└── README.md               # You are here! 📍
-```
+## The build
 
-## ⚙️ Configuration
+Java 25 (toolchain-pinned, so `JAVA_HOME` is irrelevant), Gradle with the Kotlin DSL, JUnit 5,
+AssertJ, Awaitility.
 
-| File                        | Purpose              | Key Features                                             |
-|-----------------------------|----------------------|----------------------------------------------------------|
-| **mise.toml**               | Mise task runner     | Tool versions, task definitions                          |
-| **build.gradle.kts**        | Gradle build         | Toolchain, Spotless, Error Prone, NullAway, JaCoCo, Shadow |
-| **gradle/libs.versions.toml** | Version catalog    | Single source of truth for dependency versions           |
-| **.lefthook.yml**           | Git hooks            | Pre-commit linting, automated quality checks             |
-| **src/main/resources/application.conf** | App config | HOCON defaults with environment variable overrides     |
+**Static analysis is deliberately relaxed by default.** Spotless, Error Prone and NullAway all run,
+but warnings stay warnings: nothing derails a timed exercise faster than a build refusing to compile
+over a missing annotation. The full gate is one flag away.
 
-Application settings are read with [Typesafe Config](https://github.com/lightbend/config) into a typed `AppConfig`
-record. Every key in `application.conf` can be overridden by an environment variable — see [.env.example](.env.example).
+| Command | What it does |
+| --- | --- |
+| `mise run test` | Fast test run |
+| `mise run tdd` | Continuous test loop |
+| `mise run kata ledger` | Run one kata's tests |
+| `mise run format` | Spotless (palantir-java-format) |
+| `mise run check` | format + compile + test |
+| `mise run verify` | The full gate: `-Werror`, NullAway as errors, 80% coverage floor |
 
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (**Conventional Commits**)
-4. Push to the branch
-5. Open a Pull Request
-
-## 🔒 Security
-
-Please see [SECURITY.md](SECURITY.md) for our security policy and how to report security vulnerabilities.
-
-## 📄 License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Temurin](https://adoptium.net/) for the JDK builds
-- [Gradle](https://gradle.org/) for the build system
-- [Spotless](https://github.com/diffplug/spotless) and [palantir-java-format](https://github.com/palantir/palantir-java-format) for formatting
-- [Error Prone](https://errorprone.info/) and [NullAway](https://github.com/uber/NullAway) for compile-time bug detection
-- [mise](https://mise.jdx.dev/) for tool and task management
-- [Lefthook](https://github.com/evilmartians/lefthook) for fast and reliable Git hooks
-- [act](https://github.com/nektos/act) for local CI simulation
-
----
-
-**Happy coding! 🎉** If you find this template useful, please give it a ⭐️
+Details of layout and conventions live in [AGENTS.md](AGENTS.md).
