@@ -10,10 +10,19 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
-// TODO: Replace with your own group and version.
 group = "io.github.tabmadi"
 
 version = "0.0.0"
+
+// Live-coding ergonomics: the full static-analysis gate is opt-in.
+//
+//   ./gradlew test            -> fast, warnings stay warnings
+//   ./gradlew check -Pstrict  -> -Werror + NullAway as errors + coverage floor
+//
+// Nothing is more expensive in a timed interview than a build that refuses to
+// compile because a parameter is missing an annotation. Strictness is for the
+// commit, not for the keystroke.
+val strict = providers.gradleProperty("strict").isPresent
 
 repositories { mavenCentral() }
 
@@ -42,6 +51,7 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)
+    testImplementation(libs.awaitility)
     testCompileOnly(libs.jspecify)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
@@ -50,10 +60,11 @@ nullaway { annotatedPackages.add("io.github.tabmadi") }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf("-Xlint:all", "-Werror"))
+    options.compilerArgs.add("-Xlint:all")
+    if (strict) options.compilerArgs.add("-Werror")
     options.errorprone {
         disableWarningsInGeneratedCode = true
-        nullaway { error() }
+        if (strict) nullaway { error() } else nullaway { warn() }
     }
 }
 
@@ -79,8 +90,17 @@ spotless {
 
 tasks.test {
     useJUnitPlatform()
-    testLogging { events("passed", "skipped", "failed") }
-    finalizedBy(tasks.jacocoTestReport)
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+    // Concurrency tests are slow and flaky when starved; give them their own threads
+    // rather than sharing one JVM lane with everything else.
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    // A hung test is a failed test. Without this a deadlock bug stalls the build
+    // instead of reporting itself.
+    systemProperty("junit.jupiter.execution.timeout.testable.method.default", "30s")
+    if (strict) finalizedBy(tasks.jacocoTestReport)
 }
 
 // The entry point is thin glue and is covered end-to-end, not by unit tests.
@@ -113,7 +133,7 @@ tasks.jacocoTestCoverageVerification {
     }
 }
 
-tasks.check { dependsOn(tasks.jacocoTestCoverageVerification) }
+if (strict) tasks.check { dependsOn(tasks.jacocoTestCoverageVerification) }
 
 tasks.shadowJar {
     archiveFileName = "app.jar"

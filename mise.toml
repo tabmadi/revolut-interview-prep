@@ -17,10 +17,22 @@ run = "./gradlew spotlessApply"
 run = "./gradlew spotlessCheck compileJava compileTestJava"
 
 [tasks.test]
-run = "./gradlew test jacocoTestCoverageVerification"
+run = "./gradlew test"
+
+# Continuous test loop: the inner loop during a live-coding session.
+[tasks.tdd]
+run = "./gradlew test --continuous --console=plain"
+
+# Run one kata's tests, e.g. `mise run kata ledger`.
+[tasks.kata]
+run = "./gradlew test --tests '*katas.{{arg(name=\"name\")}}*' --console=plain"
 
 [tasks.check]
 depends = ["format", "lint", "test"]
+
+# The full gate: warnings-as-errors, NullAway as errors, coverage floor.
+[tasks.verify]
+run = "./gradlew clean check -Pstrict"
 
 [tasks.pre-commit]
 depends = ["format", "lint"]
