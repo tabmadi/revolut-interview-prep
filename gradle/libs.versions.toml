@@ -1,0 +1,29 @@
+[versions]
+java = "25"
+palantir-java-format = "2.98.0"
+errorprone = "2.50.0"
+nullaway = "0.14.1"
+jspecify = "1.0.1"
+typesafe-config = "1.4.9"
+slf4j = "2.0.19"
+logback = "1.6.3"
+junit = "6.1.3"
+assertj = "3.27.7"
+
+[libraries]
+typesafe-config = { module = "com.typesafe:config", version.ref = "typesafe-config" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version = "8.10.2" }
+errorprone = { id = "net.ltgt.errorprone", version = "5.1.1" }
+nullaway = { id = "net.ltgt.nullaway", version = "3.2.0" }
+shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
